@@ -50,6 +50,7 @@ jobs:
       - name: Generate .env from GitHub Secrets
         run: |
           cat <<EOF > .env
+          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           SPRING_DATASOURCE_URL=${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
