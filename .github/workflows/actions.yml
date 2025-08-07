@@ -36,7 +36,7 @@ jobs:
       - name: Wait for Postgres to be ready
         run: |
           for i in {1..15}; do
-            if docker exec $(docker ps -q -f name=db) pg_isready -U ${{ secrets.TEST_DB_USERNAME }}; then
+            if docker exec $(docker ps -q -f name=db) pg_isready -U ${{ secrets.TEST_DB_NAME }}; then
               echo "Postgres is ready!"
               break
             fi
