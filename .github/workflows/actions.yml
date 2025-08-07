@@ -20,7 +20,7 @@ jobs:
       - name: Inject application.yml for tests
         run: |
           mkdir -p src/main/resources
-          echo -e "${{ secrets.APPYML }}" > src/main/resources/application.yml
+          echo -e "${{ secrets.TEST_APPYML }}" > src/main/resources/application.yml
       
       - name: Inject docker-compose.yml
         run: |
@@ -31,6 +31,14 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew test --no-daemon
+
+      - name: Remove test application.yml
+        run: rm -f src/main/resources/application.yml
+
+      - name: Inject application.yml for deployment
+        run: |
+          mkdir -p src/main/resources
+          echo -e "${{ secrets.APPYML }}" > src/main/resources/application.yml
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -51,48 +59,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/peopleofdelivery:latest
-
-      # - name: Generate .env from GitHub Secrets
-      #   run: |
-      #     cat <<EOF > .env
-      #     DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-      #     SPRING_DATASOURCE_URL=${{ secrets.DB_URL }}
-      #     SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
-      #     SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
-      #     LOCAL_DB_URL=${{ secrets.DB_URL }}
-      #     LOCAL_DB_USERNAME=${{ secrets.DB_USERNAME }}
-      #     LOCAL_DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-      #     MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-      #     MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-      #     GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-      #     GOOGLE_CLIENT_SECRET_ID=${{ secrets.GOOGLE_CLIENT_SECRET_ID }}
-      #     JWT_SECRET=${{ secrets.JWT_SECRET }}
-      #     JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
-      #     TOSS_SECRET=${{ secrets.TOSS_SECRET }}
-      #     TOSS_CLIENT=${{ secrets.TOSS_CLIENT }}
-      #     EOF
-
-      # - name: Upload .env to EC2
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USERNAME }}
-      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-      #     source: .env
-      #     target: /home/${{ secrets.EC2_USERNAME }}/
-
-      # - name: Generate application.yml for runtime
-      #   run: |
-      #     echo "${{ secrets.APPYML }}" > application.yml
-
-      # - name: Upload application.yml to EC2
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USERNAME }}
-      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-      #     source: application.yml
-      #     target: /home/${{ secrets.EC2_USERNAME }}/
 
       - name: Upload docker-compose.yml artifact
         uses: actions/upload-artifact@v4
@@ -191,7 +157,7 @@ jobs:
               exit 1
             fi
 
-            # 2) docker-compose 에서 application.yml 을 마운트 하도록
+            # 2) docker-compose.yml 이 있는지 확인
             sudo docker-compose down
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/peopleofdelivery:latest
             sudo docker-compose up -d
