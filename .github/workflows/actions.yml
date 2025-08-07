@@ -31,6 +31,11 @@ jobs:
         run: |
           mkdir -p ./
           echo -e "${{ secrets.TEST_DATA_SQL }}" > src/test/resources/test-data.sql
+      
+      - name: Check test-data.sql in CI
+        run: |
+          ls -l src/test/resources/
+          cat src/test/resources/test-data.sql
 
       # # 🟢 테스트용 Postgres 컨테이너 시작
       # - name: Start Postgres for test
