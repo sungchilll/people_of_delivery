@@ -131,5 +131,5 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             chmod +x deploy.sh
-            ./deploy.sh ${{ secrets.EC2_HOST }} ${{ secrets.EC2_USERNAME }} ${{ secrets.EC2_PRIVATE_KEY }}
+            ./deploy.sh ${{ secrets.PRIVATE_APP_HOST }} ${{ secrets.EC2_USERNAME }} ${{ secrets.EC2_PRIVATE_KEY }}
             echo "Deployment completed successfully."
