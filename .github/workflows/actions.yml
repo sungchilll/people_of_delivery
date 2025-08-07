@@ -20,12 +20,12 @@ jobs:
       - name: Inject application.yml for tests
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPYML }}" | base64 -d > src/main/resources/application.yml
+          echo "${{ secrets.APPYML }}" | base64 --decode > src/main/resources/application.yml
       
       - name: Inject docker-compose.yml
         run: |
           mkdir -p ./
-          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 -d > docker-compose.yml
+          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > docker-compose.yml
 
       # - name: Run tests
       #   run: |
