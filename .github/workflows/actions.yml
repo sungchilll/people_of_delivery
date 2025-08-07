@@ -30,8 +30,7 @@ jobs:
       # 🟢 테스트용 Postgres 컨테이너 시작
       - name: Start Postgres for test
         run: |
-          docker-compose up -d db
-        # docker-compose.yml에 db service 명이 'db'라고 가정
+          docker compose up -d
 
       # (Optional) DB가 완전히 뜰 때까지 대기 (30초 내외)
       - name: Wait for Postgres to be ready
@@ -58,11 +57,11 @@ jobs:
           rm -f src/main/resources/application.yml
           rm -f docker-compose.yml
 
-      - name: Remove test application.yml
-        run: rm -f src/main/resources/application.yml
+      # - name: Remove test application.yml
+      #   run: rm -f src/main/resources/application.yml
       
-      - name: Remove test docker-compose.yml
-        run: rm -f docker-compose.yml
+      # - name: Remove test docker-compose.yml
+      #   run: rm -f docker-compose.yml
 
       - name: Inject application.yml for deployment
         run: |
