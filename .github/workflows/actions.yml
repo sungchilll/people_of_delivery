@@ -17,10 +17,10 @@ jobs:
           distribution: "temurin"
           cache: gradle
 
-      - name: Inject application.yml for tests
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPYML }}" > src/main/resources/application.yml
+      # - name: Inject application.yml for tests
+      #   run: |
+      #     mkdir -p src/main/resources
+      #     echo "${{ secrets.APPYML }}" > src/main/resources/application.yml
 
       # - name: Run tests
       #   run: |
@@ -55,6 +55,17 @@ jobs:
           SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
+          LOCAL_DB_URL=${{ secrets.DB_URL }}
+          LOCAL_DB_USERNAME=${{ secrets.DB_USERNAME }}
+          LOCAL_DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET_ID=${{ secrets.GOOGLE_CLIENT_SECRET_ID }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+          TOSS_SECRET=${{ secrets.TOSS_SECRET }}
+          TOSS_CLIENT=${{ secrets.TOSS_CLIENT }}
           EOF
 
       - name: Upload .env to EC2
@@ -70,20 +81,26 @@ jobs:
         run: |
           echo "${{ secrets.APPYML }}" > application.yml
 
-      - name: Upload application.yml to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: application.yml
-          target: /home/${{ secrets.EC2_USERNAME }}/
+      # - name: Upload application.yml to EC2
+      #   uses: appleboy/scp-action@v0.1.7
+      #   with:
+      #     host: ${{ secrets.EC2_HOST }}
+      #     username: ${{ secrets.EC2_USERNAME }}
+      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
+      #     source: application.yml
+      #     target: /home/${{ secrets.EC2_USERNAME }}/
 
       - name: Upload docker-compose.yml artifact
         uses: actions/upload-artifact@v4
         with:
           name: docker-compose.yml
           path: docker-compose.yml
+      
+      - name: Upload application.yml artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application.yml
+          path: ./src/main/resources/application.yml
 
 
   cd:
@@ -140,6 +157,8 @@ jobs:
                 -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
+
+            source .env
 
             cd /home/${{ secrets.EC2_USERNAME }}
 
