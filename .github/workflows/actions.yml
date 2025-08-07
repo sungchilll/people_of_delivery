@@ -54,7 +54,6 @@ jobs:
           SPRING_DATASOURCE_URL=${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
           LOCAL_DB_URL=${{ secrets.DB_URL }}
           LOCAL_DB_USERNAME=${{ secrets.DB_USERNAME }}
           LOCAL_DB_PASSWORD=${{ secrets.DB_PASSWORD }}
