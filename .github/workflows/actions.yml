@@ -157,8 +157,6 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            source .env
-
             cd /home/${{ secrets.EC2_USERNAME }}
 
             # 1) application.yml 이 있는지 확인
@@ -170,6 +168,7 @@ jobs:
               exit 1
             fi
 
+            source .env
             # 2) docker-compose 에서 application.yml 을 마운트 하도록
             sudo docker-compose down
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/peopleofdelivery:latest
