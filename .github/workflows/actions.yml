@@ -76,9 +76,9 @@ jobs:
           source: .env
           target: /home/${{ secrets.EC2_USERNAME }}/
 
-      - name: Generate application.yml for runtime
-        run: |
-          echo "${{ secrets.APPYML }}" > application.yml
+      # - name: Generate application.yml for runtime
+      #   run: |
+      #     echo "${{ secrets.APPYML }}" > application.yml
 
       # - name: Upload application.yml to EC2
       #   uses: appleboy/scp-action@v0.1.7
@@ -111,6 +111,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docker-compose.yml
+          path: ./
+      
+      - name: Download application.yml
+        uses: actions/download-artifact@v4
+        with:
+          name: application.yml
           path: ./
 
       - name: Verify docker-compose.yml
