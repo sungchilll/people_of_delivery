@@ -168,7 +168,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             chmod +x deploy.sh
-            ./deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.PRIVATE_APP_HOST }} ./goorm-keypair.pem
+            chmod 600 ./goorm-keypair.pem
+            ./deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.PRIVATE_APP_HOST }} ~/goorm-keypair.pem
             echo "Deployment completed successfully."
             # rm -f docker-compose.yml
             # rm -f application.yml

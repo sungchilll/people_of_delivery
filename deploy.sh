@@ -1,17 +1,31 @@
 #!/bin/bash
-APP_HOST=$1        # app 서버의 프라이빗 IP
-APP_USER=$2        # ec2-user (Amazon Linux)
-APP_KEY=$3         # app 서버 ssh 키파일 경로
+set -euo pipefail
 
-echo "==== [Bastion → App 서버 SSH] ===="
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <user@host> <path-to-key.pem>"
+  exit 1
+fi
+
+APP_DEST="$1"           # ex) ec2-user@192.168.2.77
+APP_KEY="$2"            # ex) ~/goorm-keypair.pem
+
+# user@host 를 분리
+APP_USER="${APP_DEST%@*}"
+APP_HOST="${APP_DEST#*@}"
+REMOTE_DIR="/home/${APP_USER}"
+
+echo "==== [Bastion → App 서버: ${APP_USER}@${APP_HOST}] ===="
 
 # 1. App 서버에 필요한 파일 복사 (docker-compose.yml, application.yml)
-scp -i "$APP_KEY" -o StrictHostKeyChecking=no /home/${USER}/docker-compose.yml ${APP_USER}@${APP_HOST}:/home/${APP_USER}/
-scp -i "$APP_KEY" -o StrictHostKeyChecking=no /home/${USER}/application.yml ${APP_USER}@${APP_HOST}:/home/${APP_USER}/
+scp -i "${APP_KEY}" -o StrictHostKeyChecking=no docker-compose.yml \
+    "${APP_DEST}:${REMOTE_DIR}/"
+scp -i "${APP_KEY}" -o StrictHostKeyChecking=no application.yml \
+    "${APP_DEST}:${REMOTE_DIR}/"
 
 # 2. App 서버에 SSH로 진입해서 도커 컨테이너 재기동
-ssh -i "$APP_KEY" -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} << 'EOF'
-  cd /home/ec2-user/
+ssh -i "${APP_KEY}" -o StrictHostKeyChecking=no "${APP_DEST}" << EOF
+  set -euo pipefail
+  cd "${REMOTE_DIR}"
   echo "===== DOCKER DEPLOY START ====="
 
   #— JDK 21 설치 (Amazon Corretto 21)
