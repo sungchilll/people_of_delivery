@@ -170,7 +170,7 @@ jobs:
             chmod +x deploy.sh
             ./deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.PRIVATE_APP_HOST }} ./goorm-keypair.pem
             echo "Deployment completed successfully."
-            rm -f docker-compose.yml
-            rm -f application.yml
-            rm -f goorm-keypair.pem
-            rm -f deploy.sh
+            # rm -f docker-compose.yml
+            # rm -f application.yml
+            # rm -f goorm-keypair.pem
+            # rm -f deploy.sh
