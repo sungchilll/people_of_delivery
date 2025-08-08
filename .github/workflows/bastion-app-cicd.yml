@@ -32,6 +32,11 @@ jobs:
           mkdir -p ./
           echo -e "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
 
+      - name: Inject goorm-keypair.pem for deployment
+        run: |
+          mkdir -p ./
+          echo -e "${{ secrets.EC2_PRIVATE_KEY }}" > goorm-keypair.pem
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -63,6 +68,12 @@ jobs:
         with:
           name: application.yml
           path: src/main/resources/application.yml
+      
+      - name: Upload goorm-keypair.pem artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: goorm-keypair.pem
+          path: goorm-keypair.pem
         
       - name: Upload deploy.sh artifact
         uses: actions/upload-artifact@v4
@@ -86,6 +97,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: application.yml
+          path: ./
+        
+      - name: Download goorm-keypair.pem
+        uses: actions/download-artifact@v4
+        with:
+          name: goorm-keypair.pem
           path: ./
 
       - name: Download deploy.sh
@@ -113,6 +130,7 @@ jobs:
             docker-compose.yml
             application.yml
             deploy.sh
+            goorm-keypair.pem
           target: /home/${{ secrets.EC2_USERNAME }}/
 
       - name: Deploy from Bastion to App Server
@@ -123,5 +141,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             chmod +x deploy.sh
-            ./deploy.sh ${{ secrets.PRIVATE_APP_HOST }} ${{ secrets.EC2_USERNAME }} ${{ secrets.EC2_PRIVATE_KEY }}
+            ./deploy.sh ${{ secrets.EC2_USERNAME }}@${{ secrets.PRIVATE_APP_HOST }} ./goorm-keypair.pem
             echo "Deployment completed successfully."
+            rm -f docker-compose.yml
+            rm -f application.yml
+            rm -f goorm-keypair.pem
+            rm -f deploy.sh
